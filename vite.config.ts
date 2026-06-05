@@ -23,5 +23,15 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            recharts: ['recharts'],
+            react: ['react', 'react-dom'],
+          },
+        },
+      },
+    },
   }
 })

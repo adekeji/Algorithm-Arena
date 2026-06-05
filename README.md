@@ -110,13 +110,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 ## Submission Checklist
 
 - [ ] Register for Agents League
-- [ ] Select your challenge track
-- [ ] Ensure Foundry IQ integration is working in demo
+- [ ] Select your challenge track (Creative Apps with GitHub Copilot)
+- [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with grounded catalog + indexed citations
 - [ ] Record demo video (max 5 minutes)
-- [ ] Keep repository public
-- [ ] Keep README updated
-- [ ] Include architecture diagram
-- [ ] Ensure no credentials/secrets are committed
+- [x] Public repository: https://github.com/adekeji/Algorithm
+- [x] README updated with architecture, setup, and provisioned resources
+- [x] Architecture diagram included
+- [x] No credentials or secrets committed (`.env` is gitignored, only `.env.example` is tracked)
 - [ ] Submit project description + video + repo + diagram in contest portal
 
 ## Security Notes

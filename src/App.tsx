@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { algorithms } from './data/algorithms'
 import { CatalogView } from './components/CatalogView'
 import { CompareView } from './components/CompareView'
 import { BenchmarkView } from './components/BenchmarkView'
-import { AgentAssistView } from './components/AgentAssistView'
+
+const AgentAssistView = lazy(() =>
+  import('./components/AgentAssistView').then((m) => ({ default: m.AgentAssistView })),
+)
 
 type Tab = 'catalog' | 'compare' | 'benchmark' | 'agent'
 
@@ -87,7 +90,17 @@ export default function App() {
           />
         )}
         {tab === 'benchmark' && <BenchmarkView algorithms={algorithms} />}
-        {tab === 'agent' && <AgentAssistView />}
+        {tab === 'agent' && (
+          <Suspense
+            fallback={
+              <div className="glass rounded-xl p-6 text-sm text-white/55">
+                Loading Foundry IQ Agent...
+              </div>
+            }
+          >
+            <AgentAssistView />
+          </Suspense>
+        )}
       </main>
 
       <footer className="mx-auto max-w-7xl px-5 pb-10 pt-4 text-center text-xs text-white/30">
