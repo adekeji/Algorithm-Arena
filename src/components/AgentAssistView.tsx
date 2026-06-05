@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { GlassPanel } from './Glass'
 import {
+  buildSystemPrompt,
   invokeFoundryIq,
+  type FoundryChatMessage,
   type FoundryCitation,
   type FoundryIqConfig,
 } from '../services/foundryIq'
@@ -25,18 +27,25 @@ const starterPrompts = [
 export function AgentAssistView() {
   const [cfg, setCfg] = useState<FoundryIqConfig>({
     endpointUrl: import.meta.env.VITE_FOUNDRY_IQ_ENDPOINT_URL ?? '',
+    deployment: import.meta.env.VITE_FOUNDRY_IQ_DEPLOYMENT ?? '',
     apiKey: '',
-    authMode: (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as 'api-key' | 'bearer') || 'api-key',
-    apiVersion: import.meta.env.VITE_FOUNDRY_IQ_API_VERSION ?? '2025-05-01-preview',
+    authMode: (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as 'api-key' | 'bearer') || 'bearer',
+    apiVersion: import.meta.env.VITE_FOUNDRY_IQ_API_VERSION ?? '2025-01-01-preview',
   })
-  const [conversationId, setConversationId] = useState<string | undefined>(undefined)
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
 
   const canSend = useMemo(
-    () => Boolean(draft.trim() && cfg.endpointUrl.trim() && cfg.apiKey.trim() && !loading),
+    () =>
+      Boolean(
+        draft.trim() &&
+          cfg.endpointUrl.trim() &&
+          cfg.deployment.trim() &&
+          cfg.apiKey.trim() &&
+          !loading,
+      ),
     [draft, cfg, loading],
   )
 
@@ -49,18 +58,23 @@ export function AgentAssistView() {
       role: 'user',
       text: input,
     }
-    setMessages((prev) => [...prev, userMessage])
+    const nextHistory = [...messages, userMessage]
+    setMessages(nextHistory)
     setDraft('')
     setError(null)
     setLoading(true)
 
     try {
-      const reply = await invokeFoundryIq(cfg, {
-        input,
-        conversationId,
-      })
+      const chatHistory: FoundryChatMessage[] = [
+        { role: 'system', content: buildSystemPrompt() },
+        ...nextHistory.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.text,
+        })),
+      ]
 
-      if (reply.conversationId) setConversationId(reply.conversationId)
+      const reply = await invokeFoundryIq(cfg, chatHistory)
+
       setMessages((prev) => [
         ...prev,
         {
@@ -84,8 +98,8 @@ export function AgentAssistView() {
       <GlassPanel className="p-5">
         <h2 className="mb-2 text-lg font-semibold text-white">Foundry IQ Agent</h2>
         <p className="mb-4 text-sm text-white/60">
-          Connect your Microsoft Foundry-powered endpoint here to make grounded, cited algorithm
-          recommendations. Keep keys local: this app never writes your token to disk.
+          Grounded algorithm advisor powered by a Microsoft Foundry chat deployment with the
+          Algorithm Arena catalog as the IQ retrieval corpus. Tokens stay in your browser.
         </p>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -94,7 +108,17 @@ export function AgentAssistView() {
             <input
               value={cfg.endpointUrl}
               onChange={(e) => setCfg((c) => ({ ...c, endpointUrl: e.target.value }))}
-              placeholder="https://<project-or-agent-endpoint>/..."
+              placeholder="/foundry  (Vite dev proxy)"
+              className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
+            />
+          </label>
+
+          <label className="text-xs text-white/55">
+            Deployment name
+            <input
+              value={cfg.deployment}
+              onChange={(e) => setCfg((c) => ({ ...c, deployment: e.target.value }))}
+              placeholder="gpt-41-mini"
               className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
             />
           </label>
@@ -104,7 +128,7 @@ export function AgentAssistView() {
             <input
               value={cfg.apiVersion ?? ''}
               onChange={(e) => setCfg((c) => ({ ...c, apiVersion: e.target.value }))}
-              placeholder="2025-05-01-preview"
+              placeholder="2025-01-01-preview"
               className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
             />
           </label>
@@ -118,30 +142,30 @@ export function AgentAssistView() {
               }
               className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
             >
+              <option value="bearer" className="bg-[#0a0c14]">
+                Authorization: Bearer (Entra)
+              </option>
               <option value="api-key" className="bg-[#0a0c14]">
                 api-key header
-              </option>
-              <option value="bearer" className="bg-[#0a0c14]">
-                Authorization: Bearer
               </option>
             </select>
           </label>
 
-          <label className="text-xs text-white/55">
+          <label className="text-xs text-white/55 md:col-span-2">
             API key or bearer token
             <input
               type="password"
               value={cfg.apiKey}
               onChange={(e) => setCfg((c) => ({ ...c, apiKey: e.target.value }))}
-              placeholder="Paste token"
+              placeholder="Paste token (e.g. output of scripts/get-foundry-token.ps1)"
               className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
             />
           </label>
         </div>
 
         <p className="mt-3 text-xs text-white/40">
-          Tip: use an agent endpoint with Foundry IQ knowledge retrieval enabled for grounded
-          enterprise citations.
+          Tip: the provisioned account has disableLocalAuth=true, so use bearer mode with a token
+          from <code className="text-white/70">scripts/get-foundry-token.ps1</code>.
         </p>
       </GlassPanel>
 
@@ -192,7 +216,8 @@ export function AgentAssistView() {
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-white/45">Citations</p>
                   {m.citations.map((c) => (
-                    <div key={`${c.title}-${c.url ?? ''}`} className="text-xs text-white/70">
+                    <div key={`${c.index}-${c.title}`} className="text-xs text-white/70">
+                      <span className="font-mono text-white/45">[{c.index}]</span>{' '}
                       {c.url ? (
                         <a
                           href={c.url}
@@ -240,7 +265,6 @@ export function AgentAssistView() {
             <button
               onClick={() => {
                 setMessages([])
-                setConversationId(undefined)
                 setError(null)
               }}
               className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 hover:border-white/25 hover:text-white"

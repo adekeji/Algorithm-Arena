@@ -30,10 +30,12 @@ flowchart LR
   W --> C[Catalog and Compare Engine]
   W --> B[Live Benchmark Engine]
   W --> A[Foundry IQ Agent Panel]
-  A --> F[Microsoft Foundry Agent Endpoint]
-  F --> IQ[Foundry IQ Knowledge Retrieval]
-  IQ --> DS[Connected Enterprise Data Sources]
-  F --> R[Grounded Response with Citations]
+  A -- bearer token --> P[Vite dev proxy / reverse proxy]
+  P --> F[Microsoft Foundry AI Services account]
+  F --> M[gpt-41-mini chat deployment]
+  W --> G[Algorithm catalog grounding corpus]
+  G -- injected as system context --> M
+  M --> R[Grounded answer with bracket citations]
   R --> A
 ```
 
@@ -55,33 +57,38 @@ npm run dev
 
 ## Foundry IQ Setup
 
-The Foundry IQ Agent tab expects your endpoint details at runtime.
+The Foundry IQ Agent tab calls a Foundry-hosted chat deployment via the
+Azure OpenAI-compatible data plane. Algorithm Arena’s own algorithm catalog
+is injected into the system prompt as a grounding corpus, and the model is
+instructed to cite with `[n]` indices that map to entries in that corpus.
 
-Option A: set defaults in `.env` from `.env.example`.
+Defaults are read from `.env` (copy `.env.example` to `.env`) and can be
+overridden in the UI form at runtime.
 
-Option B: paste endpoint and token directly in the UI form.
-
-Recommended: use a Foundry Agent endpoint configured with Foundry IQ knowledge retrieval, so answers include citations to grounded sources.
+In **dev**, set `VITE_FOUNDRY_IQ_ENDPOINT_URL=/foundry` so the browser hits
+the Vite proxy (defined in `vite.config.ts`), which forwards to the Foundry
+account and bypasses CORS. In **prod**, point this at your own reverse proxy
+(e.g. an Azure Function or App Service) that injects the bearer token
+server-side — never ship long-lived secrets to the browser.
 
 ### Current Provisioned Azure Foundry Resources
 
-Provisioning status in this repo:
+- Resource group: `rg-algorithm-arena` (northcentralus)
+- Foundry account: `ai-account-skldjimkph5a6` (kind=AIServices, S0)
+- Foundry project: `ai-project-algorithm-arena`
+- Chat deployment: `gpt-41-mini` (model `gpt-4.1-mini` @ `2025-04-14`, GlobalStandard)
+- Azure OpenAI base: `https://ai-account-skldjimkph5a6.cognitiveservices.azure.com`
+- Local key auth is disabled (`disableLocalAuth=true`) → bearer mode only
+- Required data-plane roles on the account: `Cognitive Services OpenAI User`
+  and `Cognitive Services User` (already assigned to the deploying user)
 
-- Resource group: rg-algorithm-arena
-- Foundry account: ai-account-skldjimkph5a6
-- Foundry project: ai-project-algorithm-arena
-- Project API endpoint:
-  https://ai-account-skldjimkph5a6.services.ai.azure.com/api/projects/ai-project-algorithm-arena
+Hosted capability host (Foundry Agents service) failed during `azd provision`
+with a VNet configuration error. This blocks the hosted-Agent path but does
+not affect this app, which uses the chat-completions deployment directly.
 
-Notes:
+### Quick Bearer Token Flow
 
-- Core project resources were created successfully.
-- Hosted capability host failed due VNet configuration; this does not block project-level API usage.
-- Local key auth is disabled on this account, so use bearer token auth in the app.
-
-### Quick Bearer Token Flow (for testing)
-
-1. Run:
+1. Get a fresh bearer token (expires in ~1 hour):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
@@ -89,12 +96,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 
 2. In the app Foundry IQ Agent tab:
 
-- Auth mode: bearer
-- Endpoint URL: your Foundry agent invoke endpoint (or project endpoint while validating)
-- API version: 2025-05-01-preview
-- Token: paste the command output
+- Auth mode: `bearer`
+- Endpoint URL: `/foundry` (dev proxy) or your prod relay base
+- Deployment: `gpt-41-mini`
+- API version: `2025-01-01-preview`
+- Token: paste the script output
 
-3. If token expires, run the script again and paste a fresh token.
+3. Ask a question. The model is grounded to the catalog and will end with a
+   `Citations: [n], [m]` line; the UI maps those indices to algorithm entries.
+
+4. If the token expires, run the script again and paste a fresh one.
 
 ## Submission Checklist
 
