@@ -3,13 +3,15 @@ import { algorithms } from './data/algorithms'
 import { CatalogView } from './components/CatalogView'
 import { CompareView } from './components/CompareView'
 import { BenchmarkView } from './components/BenchmarkView'
+import { AgentAssistView } from './components/AgentAssistView'
 
-type Tab = 'catalog' | 'compare' | 'benchmark'
+type Tab = 'catalog' | 'compare' | 'benchmark' | 'agent'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'catalog', label: 'Catalog' },
   { id: 'compare', label: 'Compare' },
   { id: 'benchmark', label: 'Live Benchmark' },
+  { id: 'agent', label: 'Foundry IQ Agent' },
 ]
 
 export default function App() {
@@ -85,6 +87,7 @@ export default function App() {
           />
         )}
         {tab === 'benchmark' && <BenchmarkView algorithms={algorithms} />}
+        {tab === 'agent' && <AgentAssistView />}
       </main>
 
       <footer className="mx-auto max-w-7xl px-5 pb-10 pt-4 text-center text-xs text-white/30">
