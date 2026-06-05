@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "",
+    "FOUNDRY_BASE_URL": "https://ai-account-skldjimkph5a6.cognitiveservices.azure.com",
+    "FOUNDRY_DEPLOYMENT": "gpt-41-mini",
+    "FOUNDRY_API_VERSION": "2025-01-01-preview"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}

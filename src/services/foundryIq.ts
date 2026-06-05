@@ -4,7 +4,7 @@ export interface FoundryIqConfig {
   endpointUrl: string
   deployment: string
   apiKey: string
-  authMode: 'api-key' | 'bearer'
+  authMode: 'api-key' | 'bearer' | 'relay'
   apiVersion?: string
 }
 
@@ -108,6 +108,9 @@ export function citationsFromText(text: string): FoundryCitation[] {
 function buildChatUrl(cfg: FoundryIqConfig): string {
   const base = cfg.endpointUrl.trim().replace(/\/+$/, '')
   if (!base) throw new Error('Foundry endpoint URL is required.')
+  if (cfg.authMode === 'relay') {
+    return base
+  }
   if (!cfg.deployment.trim()) throw new Error('Foundry deployment name is required.')
   const v = cfg.apiVersion?.trim() || DEFAULT_API_VERSION
   return `${base}/openai/deployments/${encodeURIComponent(cfg.deployment.trim())}/chat/completions?api-version=${encodeURIComponent(v)}`
@@ -117,13 +120,15 @@ export async function invokeFoundryIq(
   cfg: FoundryIqConfig,
   messages: FoundryChatMessage[],
 ): Promise<FoundryIqReply> {
-  if (!cfg.apiKey.trim()) throw new Error('API key or bearer token is required.')
+  if (cfg.authMode !== 'relay' && !cfg.apiKey.trim()) {
+    throw new Error('API key or bearer token is required.')
+  }
 
   const url = buildChatUrl(cfg)
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (cfg.authMode === 'api-key') headers['api-key'] = cfg.apiKey.trim()
-  else headers.Authorization = `Bearer ${cfg.apiKey.trim()}`
+  else if (cfg.authMode === 'bearer') headers.Authorization = `Bearer ${cfg.apiKey.trim()}`
 
   const response = await fetch(url, {
     method: 'POST',

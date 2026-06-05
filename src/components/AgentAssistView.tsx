@@ -29,7 +29,8 @@ export function AgentAssistView() {
     endpointUrl: import.meta.env.VITE_FOUNDRY_IQ_ENDPOINT_URL ?? '',
     deployment: import.meta.env.VITE_FOUNDRY_IQ_DEPLOYMENT ?? '',
     apiKey: '',
-    authMode: (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as 'api-key' | 'bearer') || 'bearer',
+    authMode:
+      (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as FoundryIqConfig['authMode']) || 'bearer',
     apiVersion: import.meta.env.VITE_FOUNDRY_IQ_API_VERSION ?? '2025-01-01-preview',
   })
   const [draft, setDraft] = useState('')
@@ -42,8 +43,7 @@ export function AgentAssistView() {
       Boolean(
         draft.trim() &&
           cfg.endpointUrl.trim() &&
-          cfg.deployment.trim() &&
-          cfg.apiKey.trim() &&
+          (cfg.authMode === 'relay' || (cfg.deployment.trim() && cfg.apiKey.trim())) &&
           !loading,
       ),
     [draft, cfg, loading],
@@ -142,6 +142,9 @@ export function AgentAssistView() {
               }
               className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
             >
+              <option value="relay" className="bg-[#0a0c14]">
+                Hosted relay (/api/chat)
+              </option>
               <option value="bearer" className="bg-[#0a0c14]">
                 Authorization: Bearer (Entra)
               </option>
@@ -151,21 +154,24 @@ export function AgentAssistView() {
             </select>
           </label>
 
-          <label className="text-xs text-white/55 md:col-span-2">
-            API key or bearer token
-            <input
-              type="password"
-              value={cfg.apiKey}
-              onChange={(e) => setCfg((c) => ({ ...c, apiKey: e.target.value }))}
-              placeholder="Paste token (e.g. output of scripts/get-foundry-token.ps1)"
-              className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
-            />
-          </label>
+          {cfg.authMode !== 'relay' && (
+            <label className="text-xs text-white/55 md:col-span-2">
+              API key or bearer token
+              <input
+                type="password"
+                value={cfg.apiKey}
+                onChange={(e) => setCfg((c) => ({ ...c, apiKey: e.target.value }))}
+                placeholder="Paste token (e.g. output of scripts/get-foundry-token.ps1)"
+                className="glass mt-1 w-full rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50"
+              />
+            </label>
+          )}
         </div>
 
         <p className="mt-3 text-xs text-white/40">
-          Tip: the provisioned account has disableLocalAuth=true, so use bearer mode with a token
-          from <code className="text-white/70">scripts/get-foundry-token.ps1</code>.
+          {cfg.authMode === 'relay'
+            ? 'Hosted relay mode: calls /api/chat on this site, which talks to Foundry via a managed identity. No token paste needed.'
+            : 'Tip: the provisioned account has disableLocalAuth=true, so use bearer mode with a token from scripts/get-foundry-token.ps1.'}
         </p>
       </GlassPanel>
 

@@ -1,0 +1,12 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/foundry/*", "/api/*", "/*.{css,js,ico,svg,png,jpg,jpeg,webp,woff,woff2}"]
+  },
+  "routes": [
+    { "route": "/api/chat", "methods": ["POST"], "allowedRoles": ["anonymous"] }
+  ],
+  "globalHeaders": {
+    "Cache-Control": "no-store"
+  }
+}
