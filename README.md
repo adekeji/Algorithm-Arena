@@ -109,7 +109,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 
 ## Submission Checklist
 
-- [ ] Register for Agents League
+- [x] Register for Agents League
 - [ ] Select your challenge track (Creative Apps with GitHub Copilot)
 - [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with grounded catalog + indexed citations
 - [ ] Record demo video (max 5 minutes)
