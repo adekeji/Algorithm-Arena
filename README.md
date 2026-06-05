@@ -63,6 +63,39 @@ Option B: paste endpoint and token directly in the UI form.
 
 Recommended: use a Foundry Agent endpoint configured with Foundry IQ knowledge retrieval, so answers include citations to grounded sources.
 
+### Current Provisioned Azure Foundry Resources
+
+Provisioning status in this repo:
+
+- Resource group: rg-algorithm-arena
+- Foundry account: ai-account-skldjimkph5a6
+- Foundry project: ai-project-algorithm-arena
+- Project API endpoint:
+  https://ai-account-skldjimkph5a6.services.ai.azure.com/api/projects/ai-project-algorithm-arena
+
+Notes:
+
+- Core project resources were created successfully.
+- Hosted capability host failed due VNet configuration; this does not block project-level API usage.
+- Local key auth is disabled on this account, so use bearer token auth in the app.
+
+### Quick Bearer Token Flow (for testing)
+
+1. Run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
+```
+
+2. In the app Foundry IQ Agent tab:
+
+- Auth mode: bearer
+- Endpoint URL: your Foundry agent invoke endpoint (or project endpoint while validating)
+- API version: 2025-05-01-preview
+- Token: paste the command output
+
+3. If token expires, run the script again and paste a fresh token.
+
 ## Submission Checklist
 
 - [ ] Register for Agents League
