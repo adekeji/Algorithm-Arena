@@ -44,7 +44,7 @@ async function retrieveContext(
         search: query,
         top: TOP_K,
         queryType: 'simple',
-        searchMode: 'all',
+        searchMode: 'any',
         select: 'id,name,category,summary,content',
       }),
     })
