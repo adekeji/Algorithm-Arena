@@ -1,6 +1,6 @@
-// Provisions an Azure Static Web App with Managed Functions, gives it a
-// system-assigned managed identity, and assigns the data-plane roles needed
-// to call the existing Foundry AI Services account.
+// Provisions an Azure Static Web App with Managed Functions and wires the
+// Foundry chat-completions endpoint + API key as app settings so the relay
+// function (api/src/functions/chat.ts) can broker tokenless browser calls.
 //
 // Deploy (after `az login`):
 //   az deployment group create \
@@ -20,10 +20,10 @@ param foundryDeployment string = 'gpt-41-mini'
 @description('Foundry chat-completions API version.')
 param foundryApiVersion string = '2025-01-01-preview'
 
-@description('Location for the Static Web App. SWA Free is only available in a small set of regions (e.g. eastus2, westus2, centralus, westeurope, eastasia).')
+@description('Location for the Static Web App. SWA Standard is available in a small set of regions (e.g. eastus2, westus2, centralus, westeurope, eastasia).')
 param swaLocation string = 'eastus2'
 
-@description('SWA SKU. Standard is required because the relay uses a system-assigned managed identity.')
+@description('SWA SKU. Standard required for custom domains, app settings, and managed Functions at scale.')
 param swaSku string = 'Standard'
 
 resource foundry 'Microsoft.CognitiveServices/accounts@2024-10-01' existing = {
@@ -36,9 +36,6 @@ resource swa 'Microsoft.Web/staticSites@2024-04-01' = {
   sku: {
     name: swaSku
     tier: swaSku
-  }
-  identity: {
-    type: 'SystemAssigned'
   }
   properties: {
     buildProperties: {
@@ -57,31 +54,7 @@ resource swaSettings 'Microsoft.Web/staticSites/config@2024-04-01' = {
     FOUNDRY_BASE_URL: foundry.properties.endpoint
     FOUNDRY_DEPLOYMENT: foundryDeployment
     FOUNDRY_API_VERSION: foundryApiVersion
-  }
-}
-
-// Cognitive Services OpenAI User: data-plane chat-completions access.
-var openAiUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-// Cognitive Services User: read account + list deployments.
-var cogServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
-
-resource roleOpenAiUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(foundry.id, swa.id, openAiUserRoleId)
-  scope: foundry
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', openAiUserRoleId)
-    principalId: swa.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource roleCogServicesUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(foundry.id, swa.id, cogServicesUserRoleId)
-  scope: foundry
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cogServicesUserRoleId)
-    principalId: swa.identity.principalId
-    principalType: 'ServicePrincipal'
+    FOUNDRY_API_KEY: foundry.listKeys().key1
   }
 }
 

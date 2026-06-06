@@ -1,7 +1,7 @@
 {
   "name": "algorithm-arena-api",
   "version": "1.0.0",
-  "description": "SWA-managed Functions backend that brokers Foundry IQ Agent calls with a managed identity.",
+  "description": "SWA-managed Functions backend that brokers Foundry IQ Agent calls with a server-side API key.",
   "private": true,
   "main": "dist/src/functions/*.js",
   "scripts": {
@@ -10,8 +10,7 @@
     "start": "func start"
   },
   "dependencies": {
-    "@azure/functions": "^4.5.1",
-    "@azure/identity": "^4.4.1"
+    "@azure/functions": "^4.5.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
