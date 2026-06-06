@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "SWA-managed Functions backend that brokers Foundry IQ Agent calls with a managed identity.",
   "private": true,
-  "main": "dist/src/functions/chat.js",
+  "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
