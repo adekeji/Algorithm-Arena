@@ -1,0 +1,23 @@
+{
+  "name": "algorithm-catalog",
+  "fields": [
+    { "name": "id", "type": "Edm.String", "key": true, "filterable": true, "sortable": false, "facetable": false, "searchable": false },
+    { "name": "name", "type": "Edm.String", "searchable": true, "filterable": true, "sortable": true, "facetable": false, "analyzer": "en.lucene" },
+    { "name": "category", "type": "Edm.String", "searchable": true, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "summary", "type": "Edm.String", "searchable": true, "filterable": false, "sortable": false, "facetable": false, "analyzer": "en.lucene" },
+    { "name": "content", "type": "Edm.String", "searchable": true, "filterable": false, "sortable": false, "facetable": false, "analyzer": "en.lucene" },
+    { "name": "strengths", "type": "Collection(Edm.String)", "searchable": true, "filterable": true, "facetable": true },
+    { "name": "weaknesses", "type": "Collection(Edm.String)", "searchable": true, "filterable": true, "facetable": true },
+    { "name": "tags", "type": "Collection(Edm.String)", "searchable": true, "filterable": true, "facetable": true },
+    { "name": "ratingSpeed", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "ratingMemory", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "ratingCpu", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "ratingUsability", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "ratingGaming", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "ratingSimulation", "type": "Edm.Int32", "searchable": false, "filterable": true, "sortable": true, "facetable": true },
+    { "name": "complexityBest", "type": "Edm.String", "searchable": false, "filterable": true, "facetable": true },
+    { "name": "complexityAverage", "type": "Edm.String", "searchable": false, "filterable": true, "facetable": true },
+    { "name": "complexityWorst", "type": "Edm.String", "searchable": false, "filterable": true, "facetable": true },
+    { "name": "spaceComplexity", "type": "Edm.String", "searchable": false, "filterable": true, "facetable": true }
+  ]
+}

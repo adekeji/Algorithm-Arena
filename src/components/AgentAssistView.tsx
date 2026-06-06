@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { GlassPanel } from './Glass'
 import {
+  buildRelaySystemPrompt,
   buildSystemPrompt,
   invokeFoundryIq,
   type FoundryChatMessage,
@@ -65,8 +66,10 @@ export function AgentAssistView() {
     setLoading(true)
 
     try {
+      const systemContent =
+        cfg.authMode === 'relay' ? buildRelaySystemPrompt() : buildSystemPrompt()
       const chatHistory: FoundryChatMessage[] = [
-        { role: 'system', content: buildSystemPrompt() },
+        { role: 'system', content: systemContent },
         ...nextHistory.map((m) => ({
           role: m.role as 'user' | 'assistant',
           content: m.text,

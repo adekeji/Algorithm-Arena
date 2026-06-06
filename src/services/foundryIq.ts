@@ -36,6 +36,14 @@ interface GroundingEntry {
   source: string
 }
 
+interface RetrievalDoc {
+  index: number
+  id: string
+  name: string
+  category: string
+  score?: number
+}
+
 function buildGroundingCorpus(): { systemContext: string; entries: GroundingEntry[] } {
   const entries: GroundingEntry[] = []
   const lines: string[] = []
@@ -66,6 +74,7 @@ function buildGroundingCorpus(): { systemContext: string; entries: GroundingEntr
 }
 
 const grounding = buildGroundingCorpus()
+const algorithmById = new Map(algorithms.map((a) => [a.id, a]))
 
 export function buildSystemPrompt(): string {
   return [
@@ -77,6 +86,17 @@ export function buildSystemPrompt(): string {
     '',
     'Grounding corpus:',
     grounding.systemContext,
+  ].join('\n')
+}
+
+export function buildRelaySystemPrompt(): string {
+  return [
+    'You are the Algorithm Arena Foundry IQ Agent.',
+    'The server has already retrieved the most relevant algorithm entries via Azure AI Search and injected them as a second system message.',
+    'Ground every recommendation ONLY in those retrieved entries; do not invent algorithms that are not present.',
+    'Cite with bracketed indices like [1], [3] matching the retrieved entries.',
+    'If the retrieved context does not answer the question, say so explicitly.',
+    'Keep answers concise (short paragraphs or bullets) and end with a "Citations:" line listing the indices used.',
   ].join('\n')
 }
 
@@ -101,6 +121,22 @@ export function citationsFromText(text: string): FoundryCitation[] {
     const entry = grounding.entries.find((e) => e.index === index)
     if (!entry) continue
     result.push({ index, title: entry.title, source: entry.source })
+  }
+  return result
+}
+
+function citationsFromRetrieval(text: string, retrieval: RetrievalDoc[]): FoundryCitation[] {
+  const indices = parseCitationIndices(text)
+  const result: FoundryCitation[] = []
+  for (const index of indices) {
+    const doc = retrieval.find((d) => d.index === index)
+    if (!doc) continue
+    const catalogEntry = algorithmById.get(doc.id)
+    result.push({
+      index,
+      title: catalogEntry?.name ?? doc.name,
+      source: `algorithm-catalog#${doc.id}`,
+    })
   }
   return result
 }
@@ -157,9 +193,14 @@ export async function invokeFoundryIq(
   const choice = (data.choices as Array<{ message?: { content?: string } }> | undefined)?.[0]
   const text = choice?.message?.content?.trim() || 'No reply returned by the model.'
 
+  const retrieval = Array.isArray(data._retrieval) ? (data._retrieval as RetrievalDoc[]) : []
+  const citations = retrieval.length
+    ? citationsFromRetrieval(text, retrieval)
+    : citationsFromText(text)
+
   return {
     text,
-    citations: citationsFromText(text),
+    citations,
     reasoningSteps: [],
     raw: data,
   }
