@@ -27,11 +27,14 @@ const starterPrompts = [
 
 export function AgentAssistView() {
   const [cfg, setCfg] = useState<FoundryIqConfig>({
-    endpointUrl: import.meta.env.VITE_FOUNDRY_IQ_ENDPOINT_URL ?? '',
-    deployment: import.meta.env.VITE_FOUNDRY_IQ_DEPLOYMENT ?? '',
+    endpointUrl:
+      import.meta.env.VITE_FOUNDRY_IQ_ENDPOINT_URL ??
+      (import.meta.env.PROD ? '/api/chat' : ''),
+    deployment: import.meta.env.VITE_FOUNDRY_IQ_DEPLOYMENT ?? 'gpt-41-mini',
     apiKey: '',
     authMode:
-      (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as FoundryIqConfig['authMode']) || 'bearer',
+      (import.meta.env.VITE_FOUNDRY_IQ_AUTH_MODE as FoundryIqConfig['authMode']) ||
+      (import.meta.env.PROD ? 'relay' : 'bearer'),
     apiVersion: import.meta.env.VITE_FOUNDRY_IQ_API_VERSION ?? '2025-01-01-preview',
   })
   const [draft, setDraft] = useState('')
