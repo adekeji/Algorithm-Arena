@@ -2,7 +2,7 @@
 
 Algorithm Arena compares computer-science algorithms across complexity, speed, memory, CPU behavior, architecture fit (ARM vs x86-64), usability, gaming fit, and simulation fit.
 
-It also includes a live benchmark engine and a Foundry IQ Agent panel for grounded recommendations with citations.
+It also includes a live benchmark engine and a Foundry IQ Agent panel for retrieval-grounded recommendations with citations, backed by an Azure AI Search index over the algorithm catalog.
 
 **Live demo:** https://happy-island-0e196290f.7.azurestaticapps.net/
 
@@ -35,18 +35,27 @@ flowchart LR
   W --> B[Live Benchmark Engine]
   W --> A[Foundry IQ Agent Panel]
   A -- POST /api/chat --> F1[SWA Managed Function chat]
-  F1 -- api-key header --> F[Microsoft Foundry AI Services account]
+  F1 -- top-k search --> S[Azure AI Search algorithm-catalog index]
+  S -- top 6 hits --> F1
+  F1 -- api-key header + grounding --> F[Microsoft Foundry AI Services account]
   F --> M[gpt-41-mini chat deployment]
-  W --> G[Algorithm catalog grounding corpus]
-  G -- injected as system context --> M
   M --> R[Grounded answer with bracket citations]
   R --> A
 ```
 
-The browser never sees a Foundry token or key. The SWA-hosted Function in
-[`api/src/functions/chat.ts`](api/src/functions/chat.ts) attaches the
-Foundry account API key server-side and forwards to the chat-completions
-endpoint.
+The browser never sees a Foundry token, a search key, or the catalog
+itself. For each user turn the SWA-hosted Function in
+[`api/src/functions/chat.ts`](api/src/functions/chat.ts):
+
+1. Issues a top-6 simple search against the `algorithm-catalog` Azure AI
+   Search index using `SEARCH_QUERY_KEY` (server-side, scoped to query-only).
+2. Builds a system message that lists each retrieved entry as
+   `[n] id=… | Name (Category)\n<content>` and tells the model to ground
+   every claim in those entries and finish with `Citations: [n], [m]`.
+3. Calls the Foundry chat-completions endpoint with the Foundry account
+   API key (`FOUNDRY_API_KEY`), then attaches a `_retrieval[]` array to
+   the response so the UI can map each cited bracket index back to the
+   matching catalog entry.
 
 ## Local Run
 
@@ -67,9 +76,11 @@ npm run dev
 ## Foundry IQ Setup
 
 The Foundry IQ Agent tab calls a Foundry-hosted chat deployment via the
-Azure OpenAI-compatible data plane. Algorithm Arena’s own algorithm catalog
-is injected into the system prompt as a grounding corpus, and the model is
-instructed to cite with `[n]` indices that map to entries in that corpus.
+Azure OpenAI-compatible data plane. In the hosted demo every turn is
+retrieval-grounded against an Azure AI Search index built from the
+algorithm catalog: the SWA Function pulls the top 6 matching entries and
+injects them as a system message, and the model is instructed to cite
+with `[n]` indices that map to those retrieved entries.
 
 The Agent tab supports three auth modes:
 
@@ -92,7 +103,9 @@ overridden in the UI form at runtime.
 - Azure OpenAI base: `https://ai-account-skldjimkph5a6.cognitiveservices.azure.com`
 - Static Web App: `algorithm-arena-web` (Standard, eastus2)
 - Hosted URL: https://happy-island-0e196290f.7.azurestaticapps.net/
-- SWA-managed Function: `POST /api/chat` (relay; reads `FOUNDRY_*` app settings)
+- SWA-managed Function: `POST /api/chat` (relay; does AI Search retrieval, then chat-completions; reads `FOUNDRY_*` and `SEARCH_*` app settings)
+- Azure AI Search: `srch-algorithm-arena` (Basic SKU, centralus, 1 replica × 1 partition, ~$75/month)
+- Search index: `algorithm-catalog` (21 docs, schema in [`infra/search-index.json`](infra/search-index.json), seeded via [`scripts/push-search-docs.ts`](scripts/push-search-docs.ts))
 
 Infra is defined in [`infra/swa.bicep`](infra/swa.bicep) and deploys via the
 `Deploy Static Web App` GitHub Actions workflow in
@@ -124,9 +137,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 ## Submission Checklist
 
 - [x] Register for Agents League
-- [ ] Select your challenge track (Creative Apps with GitHub Copilot)
-- [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with grounded catalog + indexed citations
+- [x] Select your challenge track (Creative Apps with GitHub Copilot)
+- [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with Azure AI Search retrieval and bracket-indexed citations
 - [x] Public hosted demo with tokenless Foundry calls: https://happy-island-0e196290f.7.azurestaticapps.net/
+- [x] Project description and 5-minute demo video script drafted: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 - [ ] Record demo video (max 5 minutes)
 - [x] Public repository: https://github.com/adekeji/Algorithm
 - [x] README updated with architecture, setup, and provisioned resources
