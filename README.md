@@ -4,6 +4,10 @@ Algorithm Arena compares computer-science algorithms across complexity, speed, m
 
 It also includes a live benchmark engine and a Foundry IQ Agent panel for grounded recommendations with citations.
 
+**Live demo:** https://happy-island-0e196290f.7.azurestaticapps.net/
+
+No sign-in, no token paste — the Foundry IQ Agent tab works out of the box against a hosted Microsoft Foundry chat deployment via a Static Web Apps managed Function relay.
+
 ## Challenge Alignment (Agents League)
 
 Track target: Creative Apps (GitHub Copilot) with Microsoft IQ integration via Foundry IQ.
@@ -26,18 +30,23 @@ This project includes:
 
 ```mermaid
 flowchart LR
-  U[User] --> W[Algorithm Arena Web App]
+  U[User browser] --> W[Algorithm Arena SPA on Azure Static Web Apps]
   W --> C[Catalog and Compare Engine]
   W --> B[Live Benchmark Engine]
   W --> A[Foundry IQ Agent Panel]
-  A -- bearer token --> P[Vite dev proxy / reverse proxy]
-  P --> F[Microsoft Foundry AI Services account]
+  A -- POST /api/chat --> F1[SWA Managed Function chat]
+  F1 -- api-key header --> F[Microsoft Foundry AI Services account]
   F --> M[gpt-41-mini chat deployment]
   W --> G[Algorithm catalog grounding corpus]
   G -- injected as system context --> M
   M --> R[Grounded answer with bracket citations]
   R --> A
 ```
+
+The browser never sees a Foundry token or key. The SWA-hosted Function in
+[`api/src/functions/chat.ts`](api/src/functions/chat.ts) attaches the
+Foundry account API key server-side and forwards to the chat-completions
+endpoint.
 
 ## Local Run
 
@@ -62,31 +71,34 @@ Azure OpenAI-compatible data plane. Algorithm Arena’s own algorithm catalog
 is injected into the system prompt as a grounding corpus, and the model is
 instructed to cite with `[n]` indices that map to entries in that corpus.
 
+The Agent tab supports three auth modes:
+
+- `relay` (default in production) — calls `/api/chat` on the same origin.
+  No token in the browser. Used by the public hosted demo.
+- `bearer` — paste a short-lived Azure AD bearer token. Used for local dev
+  through the Vite proxy at `/foundry`.
+- `api-key` — paste the Foundry account key. Convenient for one-off testing
+  only; never expose this in a shipped frontend.
+
 Defaults are read from `.env` (copy `.env.example` to `.env`) and can be
 overridden in the UI form at runtime.
 
-In **dev**, set `VITE_FOUNDRY_IQ_ENDPOINT_URL=/foundry` so the browser hits
-the Vite proxy (defined in `vite.config.ts`), which forwards to the Foundry
-account and bypasses CORS. In **prod**, point this at your own reverse proxy
-(e.g. an Azure Function or App Service) that injects the bearer token
-server-side — never ship long-lived secrets to the browser.
+### Current Provisioned Azure Resources
 
-### Current Provisioned Azure Foundry Resources
-
-- Resource group: `rg-algorithm-arena` (northcentralus)
-- Foundry account: `ai-account-skldjimkph5a6` (kind=AIServices, S0)
+- Resource group: `rg-algorithm-arena`
+- Foundry account: `ai-account-skldjimkph5a6` (kind=AIServices, S0, northcentralus)
 - Foundry project: `ai-project-algorithm-arena`
 - Chat deployment: `gpt-41-mini` (model `gpt-4.1-mini` @ `2025-04-14`, GlobalStandard)
 - Azure OpenAI base: `https://ai-account-skldjimkph5a6.cognitiveservices.azure.com`
-- Local key auth is disabled (`disableLocalAuth=true`) → bearer mode only
-- Required data-plane roles on the account: `Cognitive Services OpenAI User`
-  and `Cognitive Services User` (already assigned to the deploying user)
+- Static Web App: `algorithm-arena-web` (Standard, eastus2)
+- Hosted URL: https://happy-island-0e196290f.7.azurestaticapps.net/
+- SWA-managed Function: `POST /api/chat` (relay; reads `FOUNDRY_*` app settings)
 
-Hosted capability host (Foundry Agents service) failed during `azd provision`
-with a VNet configuration error. This blocks the hosted-Agent path but does
-not affect this app, which uses the chat-completions deployment directly.
+Infra is defined in [`infra/swa.bicep`](infra/swa.bicep) and deploys via the
+`Deploy Static Web App` GitHub Actions workflow in
+[`.github/workflows/deploy-swa.yml`](.github/workflows/deploy-swa.yml).
 
-### Quick Bearer Token Flow
+### Quick Bearer Token Flow (local dev only)
 
 1. Get a fresh bearer token (expires in ~1 hour):
 
@@ -107,11 +119,14 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 
 4. If the token expires, run the script again and paste a fresh one.
 
+4. If the token expires, run the script again and paste a fresh one.
+
 ## Submission Checklist
 
 - [x] Register for Agents League
 - [ ] Select your challenge track (Creative Apps with GitHub Copilot)
 - [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with grounded catalog + indexed citations
+- [x] Public hosted demo with tokenless Foundry calls: https://happy-island-0e196290f.7.azurestaticapps.net/
 - [ ] Record demo video (max 5 minutes)
 - [x] Public repository: https://github.com/adekeji/Algorithm
 - [x] README updated with architecture, setup, and provisioned resources
