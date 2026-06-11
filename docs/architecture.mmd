@@ -1,0 +1,12 @@
+flowchart LR
+  U[User browser] --> W[Algorithm Arena SPA on Azure Static Web Apps]
+  W --> C[Catalog and Compare Engine]
+  W --> B[Live Benchmark Engine]
+  W --> A[Foundry IQ Agent Panel]
+  A -- POST /api/chat --> F1[SWA Managed Function chat]
+  F1 -- top-k search --> S[Azure AI Search algorithm-catalog index]
+  S -- top 6 hits --> F1
+  F1 -- api-key header + grounding --> F[Microsoft Foundry AI Services account]
+  F --> M[gpt-41-mini chat deployment]
+  M --> R[Grounded answer with bracket citations]
+  R --> A

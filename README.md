@@ -30,6 +30,10 @@ This project includes:
 
 ## Architecture
 
+![Algorithm Arena architecture diagram](docs/architecture.png)
+
+Mermaid source ([`docs/architecture.mmd`](docs/architecture.mmd)) — same diagram inline below for editors that render Mermaid:
+
 ```mermaid
 flowchart LR
   U[User browser] --> W[Algorithm Arena SPA on Azure Static Web Apps]

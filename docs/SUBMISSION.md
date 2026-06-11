@@ -135,5 +135,5 @@ Four beats, one breath each, no fluff.
 | Live demo                     | https://happy-island-0e196290f.7.azurestaticapps.net/              |
 | Demo video                    | https://youtu.be/zx4MXF4V-QE                                       |
 | Description                   | Use Section 1 above                                                |
-| Architecture diagram          | `README.md` mermaid block (or export as PNG)                       |
+| Architecture diagram          | Upload [`docs/architecture.png`](architecture.png) (rendered) · source [`docs/architecture.mmd`](architecture.mmd) |
 | Region                        | SWA eastus2 · Foundry northcentralus · AI Search centralus         |
