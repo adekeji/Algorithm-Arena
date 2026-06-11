@@ -6,6 +6,8 @@ It also includes a live benchmark engine and a Foundry IQ Agent panel for retrie
 
 **Live demo:** https://happy-island-0e196290f.7.azurestaticapps.net/
 
+**Demo video (2 min):** https://youtu.be/zx4MXF4V-QE
+
 No sign-in, no token paste — the Foundry IQ Agent tab works out of the box against a hosted Microsoft Foundry chat deployment via a Static Web Apps managed Function relay.
 
 ## Challenge Alignment (Agents League)
@@ -141,7 +143,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 - [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with Azure AI Search retrieval and bracket-indexed citations
 - [x] Public hosted demo with tokenless Foundry calls: https://happy-island-0e196290f.7.azurestaticapps.net/
 - [x] Project description and 2-minute demo video script drafted: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
-- [ ] Record demo video (max 2 minutes) and upload to YouTube or Vimeo (public link)
+- [x] Demo video recorded and uploaded (≤ 2 min, public): https://youtu.be/zx4MXF4V-QE
 - [x] Public repository: https://github.com/adekeji/Algorithm-Arena
 - [x] README updated with architecture, setup, and provisioned resources
 - [x] Architecture diagram included

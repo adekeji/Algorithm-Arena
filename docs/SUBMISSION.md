@@ -57,6 +57,7 @@ Search (Basic) · Microsoft Foundry AI Services · Bicep · GitHub Actions.
 
 **Live demo:** https://happy-island-0e196290f.7.azurestaticapps.net/
 **Repo:** https://github.com/adekeji/Algorithm-Arena
+**Demo video:** https://youtu.be/zx4MXF4V-QE
 
 ---
 
@@ -132,7 +133,7 @@ Four beats, one breath each, no fluff.
 | Microsoft IQ integration      | Foundry AI Services (`gpt-41-mini`) + Azure AI Search retrieval    |
 | Public repo                   | https://github.com/adekeji/Algorithm-Arena                         |
 | Live demo                     | https://happy-island-0e196290f.7.azurestaticapps.net/              |
-| Demo video                    | (paste URL after upload)                                           |
+| Demo video                    | https://youtu.be/zx4MXF4V-QE                                       |
 | Description                   | Use Section 1 above                                                |
 | Architecture diagram          | `README.md` mermaid block (or export as PNG)                       |
 | Region                        | SWA eastus2 · Foundry northcentralus · AI Search centralus         |
