@@ -56,7 +56,7 @@ Azure Static Web Apps (Standard) · Azure Functions v4 (Node) · Azure AI
 Search (Basic) · Microsoft Foundry AI Services · Bicep · GitHub Actions.
 
 **Live demo:** https://happy-island-0e196290f.7.azurestaticapps.net/
-**Repo:** https://github.com/adekeji/Algorithm
+**Repo:** https://github.com/adekeji/Algorithm-Arena
 
 ---
 
@@ -149,7 +149,7 @@ beat is one breath.
 | Project name                  | Algorithm Arena                                                    |
 | Track                         | Creative Apps (GitHub Copilot)                                     |
 | Microsoft IQ integration      | Foundry AI Services (`gpt-41-mini`) + Azure AI Search retrieval    |
-| Public repo                   | https://github.com/adekeji/Algorithm                               |
+| Public repo                   | https://github.com/adekeji/Algorithm-Arena                         |
 | Live demo                     | https://happy-island-0e196290f.7.azurestaticapps.net/              |
 | Demo video                    | (paste URL after upload)                                           |
 | Description                   | Use Section 1 above                                                |

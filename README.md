@@ -142,7 +142,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 - [x] Public hosted demo with tokenless Foundry calls: https://happy-island-0e196290f.7.azurestaticapps.net/
 - [x] Project description and 5-minute demo video script drafted: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
 - [ ] Record demo video (max 5 minutes)
-- [x] Public repository: https://github.com/adekeji/Algorithm
+- [x] Public repository: https://github.com/adekeji/Algorithm-Arena
 - [x] README updated with architecture, setup, and provisioned resources
 - [x] Architecture diagram included
 - [x] No credentials or secrets committed (`.env` is gitignored, only `.env.example` is tracked)
