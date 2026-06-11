@@ -60,85 +60,66 @@ Search (Basic) · Microsoft Foundry AI Services · Bicep · GitHub Actions.
 
 ---
 
-## 2. 5-Minute Demo Video Script
+## 2. 2-Minute Demo Video Script
 
-Aim for **4:45 spoken**, leaving headroom. Talk fast but clear. Every
-beat is one breath.
+Contest hard cap is **2:00**. Aim for **1:50 spoken** to leave headroom.
+Four beats, one breath each, no fluff.
 
-### 0:00 — 0:30 · Hook & framing
+### 0:00 — 0:20 · Hook (talking head or voiceover over the live URL)
 
-> "This is **Algorithm Arena**. Every CS student gets handed the same
-> table — bubble sort, merge sort, quicksort, BFS, DFS — and told
-> 'memorize the complexities.' That table is dead. I rebuilt it as a
-> living app: you can compare, you can benchmark on your own hardware,
-> and you can ask a grounded Foundry IQ agent for a recommendation
-> with citations. Built in a GitHub Copilot loop, deployed on Azure
-> Static Web Apps with a Microsoft Foundry backend and Azure AI Search
-> for retrieval. Let me show you."
+> "This is **Algorithm Arena**. The dead textbook table of sorting and
+> graph algorithms, rebuilt as a living app you can compare, benchmark
+> on your own hardware, and ask a grounded **Microsoft Foundry IQ**
+> agent for a recommendation — with citations. Built in a **GitHub
+> Copilot** loop. Let me show you."
 
-(Cut to the live URL in the browser.)
+(Cut to the hosted demo: `https://happy-island-0e196290f.7.azurestaticapps.net/`)
 
-### 0:30 — 1:30 · Catalog browse
+### 0:20 — 0:50 · Catalog + Compare (one combined beat)
 
-- Open the hosted demo.
-- Click into a sorting algorithm (e.g. Quicksort).
-- Show the detail card: complexity, strengths, weaknesses, CPU notes,
-  ARM vs x86-64 fit, gaming/simulation tags.
-- "21 algorithms across 10 categories. Every entry is the same shape."
+- Catalog tab → click Quicksort.
+  > "21 algorithms across 10 categories. Complexity, CPU notes, ARM vs
+  > x86-64 fit, gaming tags — same shape every entry."
+- Compare tab → pin Insertion / Merge / Quicksort / Radix.
+  > "Sorting a real-time leaderboard, small N, nearly sorted. The matrix
+  > already names insertion sort — O(n) best case, cache-friendly."
 
-### 1:30 — 2:30 · Side-by-side compare
+### 0:50 — 1:15 · Live benchmark
 
-- Switch to the Compare tab.
-- Pin Insertion Sort, Merge Sort, Quicksort, Radix Sort.
-- "I want to sort a real-time game leaderboard. Small N, mostly sorted
-  frame to frame. Look at the *Best case* row — insertion sort is O(n),
-  and the *Gaming notes* call it 'cache-friendly, predictable
-  branches'. The matrix already told me the answer."
+- Benchmark tab → Run the sorting suite.
+  > "This isn't a JSON dump. The browser generates the inputs and times
+  > the algorithm live. Recharts plots latency by input size — the
+  > catalog claim is verified on *my* machine in real time."
 
-### 2:30 — 3:30 · Live benchmark
+### 1:15 — 1:50 · Foundry IQ Agent + citations (the money shot)
 
-- Switch to a benchmarkable algorithm (e.g. sorting suite).
-- Click **Run**.
-- "This isn't reading a JSON file. The browser generates inputs and
-  times the algorithm right here. Recharts plots latency by input size.
-  The catalog claim is now verified on *my* machine."
-
-### 3:30 — 4:30 · Foundry IQ Agent + retrieval (the money shot)
-
-- Switch to the Foundry IQ Agent tab.
-- Auth mode is already `relay`. No token, no key in the browser.
+- Foundry IQ Agent tab. Auth mode = `relay`. No token in the browser.
 - Ask:
-  > "Recommend an algorithm for sorting a real-time multiplayer
-  > leaderboard with about 32 players and explain the choice."
-- While the answer streams in, narrate:
-  > "Behind the scenes the SWA Function just hit Azure AI Search for the
-  > top six catalog entries that match this question — insertion sort,
-  > bubble sort, quicksort, merge sort, KMP, radix sort — injected them
-  > as a system message into a Microsoft Foundry `gpt-41-mini`
-  > deployment, and told it to ground every claim in those entries."
-- Read the answer. Point at the `Citations: [1]` line.
-- Hover/click the `[1]` chip → it lights up the Insertion Sort catalog
-  entry side-panel.
-  > "That isn't the model hallucinating insertion sort. The [1] points
-  > at the *exact* retrieved doc the relay sent it."
+  > "Best sort for a 32-player real-time leaderboard?"
+- While it answers, narrate over the request:
+  > "That POST hit a Static Web Apps Function. The Function ran a top-6
+  > **Azure AI Search** query over the catalog index, injected the hits
+  > as a system message, then called the **Microsoft Foundry** `gpt-41-mini`
+  > deployment with the account key — server side only."
+- Point at the `Citations: [1]` line and click the chip → catalog entry
+  highlights.
+  > "That `[1]` isn't a hallucination — it points at the exact retrieved
+  > catalog doc the relay sent the model. Grounded RAG, no browser keys.
+  > Built entirely with GitHub Copilot. Repo and live URL on screen."
 
-### 4:30 — 5:00 · Architecture + close
-
-- Cut to the mermaid diagram in the README (or a still slide).
-- "User browser → Static Web App SPA → SWA-managed Function → Azure AI
-  Search for retrieval → Foundry `gpt-41-mini` for generation. Keys
-  never leave the server. Whole thing built in a Copilot agent loop,
-  whole thing deployed by `git push`."
-- End on the live URL + repo URL on screen for 3 seconds.
+(Hold the repo + live URL on screen for the last 2 seconds.)
 
 ### Recording tips
 
-- Record at 1080p, 30 fps, system audio + mic.
+- Record at 1080p, 30 fps, system audio + mic. Final file ≤ 2:00.
 - Pre-warm the Foundry deployment (one throwaway call) so the live
-  question returns in <4 s.
-- Have a second tab open on the GitHub repo so you can cut to it for
-  the close.
-- Keep the cursor calm — no jittery hover.
+  question returns in < 3 s.
+- Have a second tab pre-loaded on the GitHub repo for the close cut.
+- Keep the cursor calm — no jittery hover. Cut hard between beats; no
+  fade transitions.
+- Upload to **YouTube or Vimeo** (contest requires public link); paste
+  the URL into the portal Project Description field as well as the
+  Demo Video field.
 
 ---
 

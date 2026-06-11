@@ -140,8 +140,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\get-foundry-token.ps1
 - [x] Select your challenge track (Creative Apps with GitHub Copilot)
 - [x] Foundry IQ integration working end-to-end against `gpt-41-mini` deployment with Azure AI Search retrieval and bracket-indexed citations
 - [x] Public hosted demo with tokenless Foundry calls: https://happy-island-0e196290f.7.azurestaticapps.net/
-- [x] Project description and 5-minute demo video script drafted: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
-- [ ] Record demo video (max 5 minutes)
+- [x] Project description and 2-minute demo video script drafted: [`docs/SUBMISSION.md`](docs/SUBMISSION.md)
+- [ ] Record demo video (max 2 minutes) and upload to YouTube or Vimeo (public link)
 - [x] Public repository: https://github.com/adekeji/Algorithm-Arena
 - [x] README updated with architecture, setup, and provisioned resources
 - [x] Architecture diagram included
